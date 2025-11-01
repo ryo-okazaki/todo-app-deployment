@@ -63,7 +63,7 @@
       "providerId": "google",
       "enabled": true,
       "updateProfileFirstLoginMode": "on",
-      "trustEmail": false,
+      "trustEmail": true,
       "storeToken": false,
       "addReadTokenRoleOnCreate": false,
       "authenticateByDefault": false,
@@ -71,10 +71,14 @@
       "hideOnLogin": false,
       "config": {
         "offlineAccess": "false",
-        "syncMode": "LEGACY",
-        "clientSecret": "${GOOGLE_IDP_CLIENT_SECRET}",
+        "acceptsPromptNoneForwardFromClient": "false",
         "clientId": "${GOOGLE_IDP_CLIENT_ID}",
+        "disableUserInfo": "false",
+        "filteredByClaim": "false",
+        "syncMode": "IMPORT",
+        "clientSecret": "${GOOGLE_IDP_CLIENT_SECRET}",
+        "caseSensitiveOriginalUsername": "false"
+        }
       }
-    }
   ]
 }
