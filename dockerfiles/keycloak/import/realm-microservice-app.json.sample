@@ -1,0 +1,58 @@
+{
+  "realm": "microservice-app",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": false,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": false,
+
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "accessCodeLifespan": 60,
+
+  "users": [],
+
+  "clients": [
+    {
+      "clientId": "todo-backend-client",
+      "name": "ToDo Backend Client",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${TODO_BACKEND_SECRET}",
+      "redirectUris": ["/*"],
+      "webOrigins": ["/*"],
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "protocol": "openid-connect",
+      "fullScopeAllowed": true
+    },
+    {
+      "clientId": "todo-frontend-client",
+      "name": "ToDo Frontend Client",
+      "rootUrl": "${TODO_FRONTEND_URL}",
+      "adminUrl": "${TODO_FRONTEND_URL}",
+      "enabled": true,
+      "publicClient": true,
+      "redirectUris": ["${TODO_FRONTEND_URL}/*"],
+      "webOrigins": ["${TODO_FRONTEND_URL}"],
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "protocol": "openid-connect",
+      "fullScopeAllowed": true
+    }
+  ],
+
+  "roles": {
+    "realm": [],
+    "client": {}
+  }
+}
