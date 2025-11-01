@@ -1,0 +1,20 @@
+sequenceDiagram
+    participant Frontend
+    participant Backend
+    participant Keycloak
+
+    Note over Backend: Backend Clientの2つの役割
+
+    rect rgb(200, 220, 255)
+    Note over Backend,Keycloak: 役割1: トークン検証（メイン）
+    Frontend->>Backend: API呼び出し + トークン
+    Backend->>Keycloak: トークン検証（公開鍵で）
+    Note over Backend: Standard flow不要
+    end
+
+    rect rgb(255, 220, 200)
+    Note over Backend,Keycloak: 役割2: サービスアカウント（補助）
+    Backend->>Keycloak: 自分自身で認証<br/>(Client Credentials)
+    Keycloak->>Backend: サービス用トークン
+    Note over Backend: Service accounts roles使用
+    end

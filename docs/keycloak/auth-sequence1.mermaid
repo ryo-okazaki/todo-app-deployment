@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant Backend
+    participant Keycloak
+
+    User->>Frontend: アクセス
+    Frontend->>Keycloak: ログインリダイレクト<br/>(nextjs-frontend client)
+    Keycloak->>User: ログイン画面表示
+    User->>Keycloak: 認証情報入力
+    Keycloak->>Frontend: アクセストークン返却
+    Frontend->>Backend: API呼び出し<br/>(Authorization: Bearer token)
+    Backend->>Keycloak: トークン検証<br/>(express-backend clientで検証)
+    Keycloak->>Backend: 検証結果
+    Backend->>Frontend: APIレスポンス
+    Frontend->>User: 画面表示
