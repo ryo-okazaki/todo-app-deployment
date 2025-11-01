@@ -1,0 +1,45 @@
+name: microservice-app
+services:
+  auth-keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: auth-keycloak
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KC_DB: ${KC_DB:-postgres}
+#      KC_DB_URL: ${KC_DB_URL:-jdbc:postgresql://auth-postgresql:5432/${KC_DB:-postgres}}
+      KC_DB_USERNAME: ${KC_DB_USERNAME:-postgres}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD:-password}
+      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME:-localhost}
+      KC_HOSTNAME_STRICT: ${KEYCLOAK_HOSTNAME_STRICT:-false}
+      KC_HTTP_ENABLED: ${KEYCLOAK_HTTP_ENABLED:-true}
+    ports:
+      - "${KEYCLOAK_PORT:-8080}:8080"
+    volumes:
+      - ./dockerfiles/keycloak/import/realm-microservice-app.json:/opt/keycloak/data/import/realm-microservice-app.json:ro
+      - ./keycloak-exports:/opt/keycloak/exports
+    env_file:
+      - .env.auth
+    depends_on:
+      - auth-postgresql
+
+  auth-postgresql:
+    build:
+      context: dockerfiles/postgresql
+      dockerfile: Dockerfile.dev
+    container_name: auth-postgresql
+    environment:
+      POSTGRES_DB: ${KC_DB:-postgres}
+      POSTGRES_USER: ${KC_DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${KC_DB_PASSWORD:-password}
+    env_file:
+      - .env.auth
+    ports:
+      - "${KC_POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - auth_postgres_data:/var/lib/postgresql/data
+      - ./dockerfiles/postgresql/postgresql.conf:/etc/postgresql/postgresql.conf
+
+volumes:
+  auth_postgres_data:

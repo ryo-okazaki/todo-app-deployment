@@ -1,71 +1,75 @@
-name: todo-app
+name: microservice-app
 services:
-  next:
+  todo-next:
     build:
       context: ${NEXT_SRC_DIR}
       dockerfile: Dockerfile.dev
-    container_name: next
+    container_name: todo-next
     env_file:
-      - .env
+      - .env.todo
     ports:
       - "${NEXT_HOST_PORT:-3000}:3000"
     volumes:
       - ${NEXT_SRC_DIR}:/workdir
 
-  express:
+  todo-express:
     build:
       context: ${EXPRESS_SERVER_SRC_DIR}
       dockerfile: Dockerfile.dev
-    container_name: express
+    container_name: todo-express
     env_file:
-      - .env
+      - .env.todo
     ports:
       - "${EXPRESS_SERVER_PORT:-3001}:3000"
       - "${EXPRESS_DEBUG_SERVER_PORT:-9229}:9229"
     volumes:
       - ${EXPRESS_SERVER_SRC_DIR}:/workdir
 
-  postgresql:
+  todo-postgresql:
     build:
       context: dockerfiles/postgresql
       dockerfile: Dockerfile.dev
-    container_name: postgresql
+    container_name: todo-postgresql
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
     env_file:
-      - .env
+      - .env.todo
     ports:
       - "${POSTGRES_PORT:-15432}:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - todo_postgres_data:/var/lib/postgresql/data
       - ./dockerfiles/postgresql/postgresql.conf:/etc/postgresql/postgresql.conf
 
-  mailhog:
-    container_name: mailhog
+  todo-mailhog:
+    container_name: todo-mailhog
     image: mailhog/mailhog
     ports:
       - "${MAIL_UI_PORT:-8025}:8025"
       - "${MAIL_SMTP_PORT:-1025}:1025"
+    env_file:
+      - .env.todo
     volumes:
-      - mailhog_data:/home/mailhog
+      - todo_mailhog_data:/home/mailhog
 
-  minio:
+  todo-minio:
     build:
       context: dockerfiles/minio
       dockerfile: Dockerfile.dev
-    container_name: minio
+    container_name: todo-minio
     ports:
       - "${MINIO_PORT:-9000}:9000"
       - "${MINIO_CONSOLE_PORT:-9001}:9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    env_file:
+      - .env.todo
     volumes:
-      - minio_data:/data
+      - todo_minio_data:/data
 
 volumes:
-  postgres_data:
-  minio_data:
-  mailhog_data:
+  todo_postgres_data:
+  todo_minio_data:
+  todo_mailhog_data:
