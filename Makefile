@@ -1,27 +1,46 @@
-up:
-	docker compose -f compose.local.yaml up -d --build
+up-todo:
+	docker compose -f compose.todo-app.local.yaml up -d --build
 
-down:
-	docker compose -f compose.local.yaml down
+up-auth:
+	docker compose -f compose.auth.local.yaml up -d --build
 
-restart:
-	docker compose -f compose.local.yaml restart
+down-todo:
+	docker compose -f compose.todo-app.local.yaml down
 
-rebuild:
-	docker compose -f compose.local.yaml down
-	docker compose -f compose.local.yaml up -d --build
+down-auth:
+	docker compose -f compose.auth.local.yaml down
 
-bash-next:
-	docker compose -f compose.local.yaml exec next sh
+restart-todo:
+	docker compose -f compose.todo-app.local.yaml restart
 
-bash-express:
-	docker compose -f compose.local.yaml exec express sh
+rebuild-todo:
+	docker compose -f compose.todo-app.local.yaml down
+	docker compose -f compose.todo-app.local.yaml up -d --build
 
-bash-postgres:
-	docker compose -f compose.local.yaml exec postgresql sh
+bash-auth-keycloak:
+	docker compose -f compose.auth.local.yaml exec auth-keycloak sh
 
-migrate:
-	docker compose -f compose.local.yaml exec express npm run migrate:dev
+bash-todo-next:
+	docker compose -f compose.todo-app.local.yaml exec todo-next sh
 
-reset:
-	docker compose -f compose.local.yaml exec express npm run migrate:reset
+bash-todo-express:
+	docker compose -f compose.todo-app.local.yaml exec todo-express sh
+
+bash-todo-postgres:
+	docker compose -f compose.todo-app.local.yaml exec todo-postgresql sh
+
+migrate-todo:
+	docker compose -f compose.todo-app.local.yaml exec todo-express npm run migrate:dev
+
+reset-todo:
+	docker compose -f compose.todo-app.local.yaml exec todo-express npm run migrate:reset
+
+build-k8s-images:
+	bash scripts/build-images.sh
+
+deploy-k8s: build-k8s-images
+	bash scripts/deploy-charts.sh
+
+# クリーンアップ
+clean-k8s:
+	helm uninstall --namespace default $$(helm list -n default -q) 2>/dev/null || true
