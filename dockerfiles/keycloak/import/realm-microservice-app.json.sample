@@ -54,5 +54,27 @@
   "roles": {
     "realm": [],
     "client": {}
-  }
+  },
+
+  "identityProviders": [
+    {
+      "alias": "google",
+      "displayName": "Google",
+      "providerId": "google",
+      "enabled": true,
+      "updateProfileFirstLoginMode": "on",
+      "trustEmail": false,
+      "storeToken": false,
+      "addReadTokenRoleOnCreate": false,
+      "authenticateByDefault": false,
+      "linkOnly": false,
+      "hideOnLogin": false,
+      "config": {
+        "offlineAccess": "false",
+        "syncMode": "LEGACY",
+        "clientSecret": "${GOOGLE_IDP_CLIENT_SECRET}",
+        "clientId": "${GOOGLE_IDP_CLIENT_ID}",
+      }
+    }
+  ]
 }
