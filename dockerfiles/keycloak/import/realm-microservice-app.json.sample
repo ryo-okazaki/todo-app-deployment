@@ -77,8 +77,10 @@
         "filteredByClaim": "false",
         "syncMode": "IMPORT",
         "clientSecret": "${GOOGLE_IDP_CLIENT_SECRET}",
-        "caseSensitiveOriginalUsername": "false"
-        }
+        "caseSensitiveOriginalUsername": "false",
+        "prompt": "select_account",
+        "defaultScope": "openid"
       }
+    }
   ]
 }
