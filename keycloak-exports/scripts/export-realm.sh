@@ -61,5 +61,17 @@ for idp in $(jq -r '.[].alias' "${EXPORT_DIR}/idp.json"); do
     > "${EXPORT_DIR}/idp-mappers/${idp}-mappers.json"
 done
 
+# === 8️⃣ Client Scopes ===
+echo "📦 Client Scopesをエクスポート中..."
+mkdir -p "${EXPORT_DIR}/client-scopes"
+./kcadm.sh get client-scopes -r ${TARGET_REALM} > "${EXPORT_DIR}/client-scopes/all-client-scopes.json"
+
+# 各スコープごとに詳細を出力
+for scope_id in $(jq -r '.[].id' "${EXPORT_DIR}/client-scopes/all-client-scopes.json"); do
+  scope_name=$(jq -r ".[] | select(.id==\"${scope_id}\") | .name" "${EXPORT_DIR}/client-scopes/all-client-scopes.json")
+  echo "    ↳ ${scope_name}"
+  ./kcadm.sh get client-scopes/${scope_id} -r ${TARGET_REALM} > "${EXPORT_DIR}/client-scopes/${scope_name}.json"
+done
+
 # === 完了 ===
 echo "✅ エクスポート完了: ${EXPORT_DIR}/"
