@@ -16,6 +16,19 @@
   "ssoSessionMaxLifespan": 36000,
   "accessCodeLifespan": 60,
 
+  "smtpServer" : {
+    "replyToDisplayName" : "",
+    "starttls" : "false",
+    "auth" : "",
+    "port" : "${MAIL_PORT}",
+    "host" : "${MAIL_HOST}",
+    "replyTo" : "",
+    "from" : "${MAIL_FROM}",
+    "fromDisplayName" : "Microservice App",
+    "envelopeFrom" : "",
+    "ssl" : "false"
+  },
+
   "users": [],
 
   "clients": [
