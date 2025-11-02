@@ -1,0 +1,15 @@
+name: microservice-app
+services:
+  mail-mailhog:
+    container_name: mail-mailhog
+    image: mailhog/mailhog
+    ports:
+      - "${MAIL_UI_PORT:-8025}:8025"
+      - "${MAIL_SMTP_PORT:-1025}:1025"
+    env_file:
+      - .env.mail
+    volumes:
+      - mail_mailhog_data:/home/mailhog
+
+volumes:
+  mail_mailhog_data:

@@ -1,39 +1,46 @@
 up-todo:
-	docker compose -f compose.todo-app.local.yaml up -d --build
+	docker compose --env-file .env.todo -f compose.todo-app.local.yaml up -d --build
+	docker compose --env-file .env.mail -f compose.mail.local.yaml up -d --build
 
 up-auth:
-	docker compose -f compose.auth.local.yaml up -d --build
+	docker compose --env-file .env.auth -f compose.auth.local.yaml up -d --build
+	docker compose --env-file .env.mail -f compose.mail.local.yaml up -d --build
 
 down-todo:
-	docker compose -f compose.todo-app.local.yaml down
+	docker compose --env-file .env.todo -f compose.todo-app.local.yaml down
+	docker compose --env-file .env.mail -f compose.mail.local.yaml down
 
 down-auth:
-	docker compose -f compose.auth.local.yaml down
+	docker compose --env-file .env.auth -f compose.auth.local.yaml down
+	docker compose --env-file .env.mail -f compose.mail.local.yaml down
 
 restart-todo:
-	docker compose -f compose.todo-app.local.yaml restart
+	docker compose --env-file .env.todo -f compose.todo-app.local.yaml restart
+	docker compose --env-file .env.mail -f compose.mail.local.yaml restart
 
 rebuild-todo:
-	docker compose -f compose.todo-app.local.yaml down
-	docker compose -f compose.todo-app.local.yaml up -d --build
+	docker compose --env-file .env.todo -f compose.todo-app.local.yaml down
+	docker compose --env-file .env.mail -f compose.mail.local.yaml down
+	docker compose --env-file .env.todo -f compose.todo-app.local.yaml up -d --build
+	docker compose --env-file .env.mail -f compose.mail.local.yaml up -d --build
 
 bash-auth-keycloak:
-	docker compose -f compose.auth.local.yaml exec auth-keycloak sh
+	docker compose --env-file .env.auth -f compose.todo-app.local.yaml exec auth-keycloak sh
 
 bash-todo-next:
-	docker compose -f compose.todo-app.local.yaml exec todo-next sh
+	docker compose --env-file .env.todo -f compose.todo-app.local.yaml exec todo-next sh
 
 bash-todo-express:
-	docker compose -f compose.todo-app.local.yaml exec todo-express sh
+	docker compose --env-file .env.todo -f compose.todo-app.local.yaml exec todo-express sh
 
 bash-todo-postgres:
-	docker compose -f compose.todo-app.local.yaml exec todo-postgresql sh
+	docker compose --env-file .env.todo -f compose.todo-app.local.yaml exec todo-postgresql sh
 
 migrate-todo:
-	docker compose -f compose.todo-app.local.yaml exec todo-express npm run migrate:dev
+	docker compose --env-file .env.todo -f compose.todo-app.local.yaml exec todo-express npm run migrate:dev
 
 reset-todo:
-	docker compose -f compose.todo-app.local.yaml exec todo-express npm run migrate:reset
+	docker compose --env-file .env.todo -f compose.todo-app.local.yaml exec todo-express npm run migrate:reset
 
 build-k8s-images:
 	bash scripts/build-images.sh

@@ -42,17 +42,6 @@ services:
       - todo_postgres_data:/var/lib/postgresql/data
       - ./dockerfiles/postgresql/postgresql.conf:/etc/postgresql/postgresql.conf
 
-  todo-mailhog:
-    container_name: todo-mailhog
-    image: mailhog/mailhog
-    ports:
-      - "${MAIL_UI_PORT:-8025}:8025"
-      - "${MAIL_SMTP_PORT:-1025}:1025"
-    env_file:
-      - .env.todo
-    volumes:
-      - todo_mailhog_data:/home/mailhog
-
   todo-minio:
     build:
       context: dockerfiles/minio
@@ -72,4 +61,3 @@ services:
 volumes:
   todo_postgres_data:
   todo_minio_data:
-  todo_mailhog_data:
