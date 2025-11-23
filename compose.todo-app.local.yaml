@@ -9,6 +9,7 @@ services:
       - .env.todo
     ports:
       - "${NEXT_HOST_PORT:-3000}:3000"
+#      - "${NEXT_DEBUG_PORT:-9229}:9229"
     volumes:
       - ${NEXT_SRC_DIR}:/workdir
 
@@ -21,7 +22,7 @@ services:
       - .env.todo
     ports:
       - "${EXPRESS_SERVER_PORT:-3001}:3000"
-      - "${EXPRESS_DEBUG_SERVER_PORT:-9229}:9229"
+      # - "${EXPRESS_DEBUG_SERVER_PORT:-9229}:9229"
     volumes:
       - ${EXPRESS_SERVER_SRC_DIR}:/workdir
 
