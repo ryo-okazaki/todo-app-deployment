@@ -24,6 +24,10 @@ rebuild-todo:
 	docker compose --env-file .env.todo -f compose.todo-app.local.yaml up -d --build
 	docker compose --env-file .env.mail -f compose.mail.local.yaml up -d --build
 
+rebuild-auth:
+	docker compose --env-file .env.auth -f compose.auth.local.yaml down
+	docker compose --env-file .env.auth -f compose.auth.local.yaml up -d --build
+
 bash-auth-keycloak:
 	docker compose --env-file .env.auth -f compose.auth.local.yaml exec auth-keycloak sh
 
