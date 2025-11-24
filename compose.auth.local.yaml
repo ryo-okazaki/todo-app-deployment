@@ -25,10 +25,10 @@ services:
       KC_HOSTNAME_PORT: ${KEYCLOAK_HOSTNAME_PORT:-80}
       KC_HOSTNAME_STRICT: ${KEYCLOAK_HOSTNAME_STRICT:-false}
       KC_HTTP_ENABLED: ${KEYCLOAK_HTTP_ENABLED:-true}
-    ports:
-      - "${KEYCLOAK_PORT:-8080}:8080"
       KC_PROXY: ${KEYCLOAK_PROXY:-edge}
       KC_PROXY_ADDRESS_FORWARDING: true
+    # ports:
+    #   - "${KEYCLOAK_PORT:-8080}:8080"
     volumes:
       - ./dockerfiles/keycloak/import/realm-microservice-app.json:/opt/keycloak/data/import/realm-microservice-app.json:ro
       - ./keycloak-exports:/opt/keycloak/exports
