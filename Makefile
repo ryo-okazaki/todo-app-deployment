@@ -1,3 +1,7 @@
+up-all:
+	$(MAKE) up-todo
+	$(MAKE) up-auth
+
 up-todo:
 	docker compose --env-file .env.todo -f compose.todo-app.local.yaml up -d --build
 	docker compose --env-file .env.mail -f compose.mail.local.yaml up -d --build
@@ -5,6 +9,10 @@ up-todo:
 up-auth:
 	docker compose --env-file .env.auth -f compose.auth.local.yaml up -d --build
 	docker compose --env-file .env.mail -f compose.mail.local.yaml up -d --build
+
+down-all:
+	$(MAKE) down-todo
+	$(MAKE) down-auth
 
 down-todo:
 	docker compose --env-file .env.todo -f compose.todo-app.local.yaml down
@@ -17,6 +25,10 @@ down-auth:
 restart-todo:
 	docker compose --env-file .env.todo -f compose.todo-app.local.yaml restart
 	docker compose --env-file .env.mail -f compose.mail.local.yaml restart
+
+rebuild-all:
+	$(MAKE) rebuild-todo
+	$(MAKE) rebuild-auth
 
 rebuild-todo:
 	docker compose --env-file .env.todo -f compose.todo-app.local.yaml down
