@@ -1,6 +1,7 @@
 {
   "realm": "microservice-app",
   "enabled": true,
+  "frontendUrl": "http://localhost:80",
   "sslRequired": "external",
   "registrationAllowed": true,
   "rememberMe" : true,
