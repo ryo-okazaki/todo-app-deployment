@@ -40,8 +40,11 @@ rebuild-auth:
 	docker compose --env-file .env.auth -f compose.auth.local.yaml down
 	docker compose --env-file .env.auth -f compose.auth.local.yaml up -d --build
 
-bash-auth-keycloak:
-	docker compose --env-file .env.auth -f compose.auth.local.yaml exec auth-keycloak sh
+bash-auth-kc-tools:
+	docker compose --env-file .env.auth -f compose.auth.local.yaml exec auth-kc-tools sh
+
+export-kc-settings:
+	docker compose --env-file .env.auth -f compose.auth.local.yaml exec auth-kc-tools bash -c "cd /opt/keycloak/exports/scripts && bash export-realm.sh"
 
 bash-todo-next:
 	docker compose --env-file .env.todo -f compose.todo-app.local.yaml exec todo-next sh
