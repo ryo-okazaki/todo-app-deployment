@@ -1,77 +1,73 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ===========================================================
-# Keycloak Realm Export Script
-# 公式CLI (kcadm.sh) を使用してRealm構成を一括バックアップ
-# ===========================================================
-
-# === 設定 ===
-KEYCLOAK_URL="http://localhost:8080"
+KEYCLOAK_URL="http://auth-keycloak:8080"
 ADMIN_REALM="master"
 ADMIN_USER="admin"
 ADMIN_PASSWORD="admin"
 TARGET_REALM="microservice-app"
 EXPORT_DIR="/opt/keycloak/exports/${TARGET_REALM}_export_$(date +%Y%m%d_%H%M%S)"
 
-# === 初期化 ===
 mkdir -p "${EXPORT_DIR}"
 
-cd /opt/keycloak/bin
-
-echo "🔐 Keycloak にログイン中..."
-./kcadm.sh config credentials \
+echo "🔐 Logging in..."
+kcadm.sh config credentials \
   --server "$KEYCLOAK_URL" \
   --realm "$ADMIN_REALM" \
   --user "$ADMIN_USER" \
   --password "$ADMIN_PASSWORD"
 
-echo "✅ ログイン成功"
+echo "📦 Export realm..."
+kcadm.sh get realms/${TARGET_REALM} > "${EXPORT_DIR}/realm.json"
 
-# === 1️⃣ Realm 全体情報 ===
-echo "📦 Realm情報をエクスポート中..."
-./kcadm.sh get realms/${TARGET_REALM} > "${EXPORT_DIR}/realm.json"
+echo "📦 Export top-level flows..."
+mkdir -p "${EXPORT_DIR}/authentication-flows"
 
-# === 2️⃣ Clients ===
-echo "📦 Clientsをエクスポート中..."
-./kcadm.sh get clients -r ${TARGET_REALM} > "${EXPORT_DIR}/clients.json"
+kcadm.sh get authentication/flows -r ${TARGET_REALM} \
+  > "${EXPORT_DIR}/authentication-flows/all-flows.json"
 
-# === 3️⃣ Roles ===
-echo "📦 Rolesをエクスポート中..."
-./kcadm.sh get roles -r ${TARGET_REALM} > "${EXPORT_DIR}/roles.json"
+# URL encode
+urlencode() {
+  jq -rn --arg v "$1" '$v|@uri'
+}
 
-# === 4️⃣ Groups ===
-echo "📦 Groupsをエクスポート中..."
-./kcadm.sh get groups -r ${TARGET_REALM} > "${EXPORT_DIR}/groups.json"
+echo "📦 Export executions for each top-level flow..."
+for flow_alias in $(jq -r '.[].alias' "${EXPORT_DIR}/authentication-flows/all-flows.json"); do
+  encoded_alias=$(urlencode "$flow_alias")
 
-# === 5️⃣ Users ===（ユーザーも含めたい場合）
-echo "📦 Usersをエクスポート中..."
-./kcadm.sh get users -r ${TARGET_REALM} > "${EXPORT_DIR}/users.json"
+  OUT_FILE="${EXPORT_DIR}/authentication-flows/${flow_alias}-executions.json"
 
-# === 6️⃣ Identity Providers ===
-echo "📦 Identity Providersをエクスポート中..."
-./kcadm.sh get identity-provider/instances -r ${TARGET_REALM} > "${EXPORT_DIR}/idp.json"
-
-# === 7️⃣ IdP Mappers ===
-echo "📦 Identity Provider Mappersをエクスポート中..."
-mkdir -p "${EXPORT_DIR}/idp-mappers"
-for idp in $(jq -r '.[].alias' "${EXPORT_DIR}/idp.json"); do
-  echo "    ↳ ${idp}"
-  ./kcadm.sh get identity-provider/instances/${idp}/mappers -r ${TARGET_REALM} \
-    > "${EXPORT_DIR}/idp-mappers/${idp}-mappers.json"
+  kcadm.sh get "authentication/flows/${encoded_alias}/executions" -r ${TARGET_REALM} \
+    > "$OUT_FILE" || true
 done
 
-# === 8️⃣ Client Scopes ===
-echo "📦 Client Scopesをエクスポート中..."
-mkdir -p "${EXPORT_DIR}/client-scopes"
-./kcadm.sh get client-scopes -r ${TARGET_REALM} > "${EXPORT_DIR}/client-scopes/all-client-scopes.json"
+echo "📦 Detecting subflow flowIds..."
+SUBFLOW_IDS=$(jq -r '
+  inputs | .[]? |
+  select(.authenticationFlow == true and .flowId != null) |
+  .flowId
+' "${EXPORT_DIR}/authentication-flows/"*-executions.json | sort -u)
 
-# 各スコープごとに詳細を出力
-for scope_id in $(jq -r '.[].id' "${EXPORT_DIR}/client-scopes/all-client-scopes.json"); do
-  scope_name=$(jq -r ".[] | select(.id==\"${scope_id}\") | .name" "${EXPORT_DIR}/client-scopes/all-client-scopes.json")
-  echo "    ↳ ${scope_name}"
-  ./kcadm.sh get client-scopes/${scope_id} -r ${TARGET_REALM} > "${EXPORT_DIR}/client-scopes/${scope_name}.json"
+echo "📦 Exporting subflow details + executions..."
+mkdir -p "${EXPORT_DIR}/authentication-flows/subflows"
+
+for fid in $SUBFLOW_IDS; do
+  echo "  → Subflow: $fid"
+
+  # 1) subflow info
+  kcadm.sh get "authentication/flows" -r ${TARGET_REALM} \
+      | jq ".[] | select(.id==\"${fid}\")" \
+      > "${EXPORT_DIR}/authentication-flows/subflows/${fid}.json"
+
+  # 2) subflow executions
+  alias=$(jq -r '.alias' "${EXPORT_DIR}/authentication-flows/subflows/${fid}.json")
+  ENC=$(urlencode "$alias")
+
+  kcadm.sh get "authentication/flows${ENC}/executions" -r ${TARGET_REALM} \
+    > "${EXPORT_DIR}/authentication-flows/subflows/${alias}-executions.json" || true
+
 done
 
-# === 完了 ===
-echo "✅ エクスポート完了: ${EXPORT_DIR}/"
+chmod -R 777 "${EXPORT_DIR}"
+
+echo "📦 DONE: $EXPORT_DIR"
