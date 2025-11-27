@@ -1,0 +1,15 @@
+FROM ubuntu:22.04
+
+RUN apt update && apt install -y jq curl unzip openjdk-17-jre
+
+# Keycloak Admin CLI のダウンロード
+RUN curl -L -o kcadm.zip https://github.com/keycloak/keycloak/releases/download/24.0.0/keycloak-24.0.0.zip \
+    && unzip kcadm.zip \
+    && mv keycloak-24.0.0/bin /opt/keycloak-cli \
+    && rm -rf keycloak-24.0.0 kcadm.zip
+
+ENV PATH="/opt/keycloak-cli:${PATH}"
+
+WORKDIR /opt/keycloak/exports/scripts
+
+CMD ["bash"]

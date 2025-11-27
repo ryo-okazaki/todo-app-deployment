@@ -54,5 +54,19 @@ services:
       - auth_postgres_data:/var/lib/postgresql/data
       - ./dockerfiles/postgresql/postgresql.conf:/etc/postgresql/postgresql.conf
 
+  auth-kc-tools:
+    build:
+      context: .
+      dockerfile: dockerfiles/keycloak/tool/Dockerfile.dev
+    container_name: keycloak-tools
+    command: [ "sleep", "infinity" ]
+    user: "${UID}:${GID}"
+    depends_on:
+      - auth-keycloak
+    volumes:
+      - ./keycloak-exports:/opt/keycloak/exports
+    environment:
+      KEYCLOAK_URL: "http://auth-keycloak:8080"
+
 volumes:
   auth_postgres_data:
