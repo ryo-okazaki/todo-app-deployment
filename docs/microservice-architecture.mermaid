@@ -1,0 +1,15 @@
+graph LR
+    A[User] --> B[next.js ToDo Application]
+    B --> C[express.js ToDo API]
+    C --> D[PostgresQL ToDo Database]
+
+    A --> E[next.js Live Application]
+    E --> F[express.js Live API]
+    F --> G[PostgresQL Live Database]
+
+    H[next.js nginx] --> I[Keycloak Authentication Service]
+
+    B -.-> |Uses nginx for routing and auth| H
+    C -.-> |Uses nginx for routing and auth| H
+    E -.-> |Uses nginx for routing and auth| H
+    F -.-> |Uses nginx for routing and auth| H
