@@ -46,6 +46,9 @@ bash-auth-kc-tools:
 export-kc-settings:
 	docker compose --env-file .env.auth -f compose.auth.local.yaml exec auth-kc-tools bash -c "cd /opt/keycloak/exports/scripts && bash export-realm.sh"
 
+export-kc-settings-details:
+	docker compose --env-file .env.auth -f compose.auth.local.yaml exec auth-kc-tools bash -c "cd /opt/keycloak/exports/scripts && bash export-realm-details.sh"
+
 bash-todo-next:
 	docker compose --env-file .env.todo -f compose.todo-app.local.yaml exec todo-next sh
 
