@@ -3,3 +3,5 @@
 .env.auth
 .env.todo
 .env.mail
+k8s
+scripts

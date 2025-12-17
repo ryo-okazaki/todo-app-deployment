@@ -1,0 +1,86 @@
+# helmfile.yaml
+repositories:
+  - name: stable
+    url: https://charts.helm.sh/stable
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+
+helmDefaults:
+  wait: true
+  timeout: 600
+  atomic: true
+  createNamespace: true
+
+environments:
+  local:
+    values:
+      - k8s/environments/local/values.yaml
+  test:
+    values:
+      - k8s/environments/test/values.yaml
+  prod:
+    values:
+      - k8s/environments/prod/values.yaml
+
+releases:
+  # インフラサービス
+  - name: postgresql
+    chart: ./k8s/charts/postgresql
+    namespace: default
+    installed: true
+    needs:
+      - default/logging
+
+  - name: minio
+    chart: ./k8s/charts/minio
+    namespace: default
+    installed: true
+    needs:
+      - default/logging
+
+  - name: mailhog
+    chart: ./k8s/charts/mailhog
+    namespace: default
+    installed: true
+    needs:
+      - default/logging
+
+  # ユーティリティサービス
+  - name: logging
+    chart: ./k8s/charts/logging
+    namespace: default
+    installed: true
+
+  - name: monitoring
+    chart: ./k8s/charts/monitoring
+    namespace: default
+    installed: true
+    needs:
+      - default/logging
+
+  # アプリケーションサービス
+  - name: express
+    chart: ./k8s/charts/express
+    namespace: default
+    installed: true
+    needs:
+      - default/postgresql
+      - default/minio
+
+  - name: next
+    chart: ./k8s/charts/next
+    namespace: default
+    installed: true
+    needs:
+      - default/express
+
+  # Umbrella chart (オプション - 必要に応じてコメント解除)
+  # - name: umbrella
+  #   chart: ./k8s/charts/umbrella
+  #   namespace: default
+  #   installed: true
+  #   needs:
+  #     - default/postgresql
+  #     - default/minio
+  #     - default/express
+  #     - default/next
