@@ -59,6 +59,18 @@ services:
     volumes:
       - todo_minio_data:/data
 
+  todo-mailhog:
+    container_name: todo-mailhog
+    image: mailhog/mailhog
+    ports:
+      - "${MAIL_UI_PORT:-8025}:8025"
+      - "${MAIL_SMTP_PORT:-1025}:1025"
+    env_file:
+      - .env.mail
+    volumes:
+      - todo_mailhog_data:/home/mailhog
+
 volumes:
   todo_postgres_data:
   todo_minio_data:
+  todo_mailhog_data:
